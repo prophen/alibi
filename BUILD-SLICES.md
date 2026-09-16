@@ -5,7 +5,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 ## Rules for whoever runs these slices (Codex, or Muse)
 
 1. **One slice per run.** Do not start the next slice until Nikema has reviewed and approved the finished one.
-2. **Stop rule on every slice:** when the slice's acceptance check passes, commit the work on a branch named `slice-N-<slug>`, push, and report: what was built, how the acceptance check passed, and anything you had to guess. Then wait. Do not merge, do not continue.
+2. **Stop rule on every slice:** when the slice's acceptance check passes, commit the work on a branch named `slice-N-<slug>`, push, open a pull request against `main` with the report as the PR description, and report: what was built, how the acceptance check passed, and anything you had to guess. Then wait. Do not merge, do not continue.
 3. **Do not invent Solari SDK APIs.** Check the installed SDK version's actual exports and docs before writing provider calls. If an API you need doesn't exist, stop and say so instead of faking it.
 4. **Secrets:** the Solari key comes from an env var (`SOLARI_API_KEY`). Never commit it, never log it, never write it to a file.
 5. **Defaults:** TypeScript (strict), CLI first, no web UI. Package name `alibi` is taken on npm; publish scope is reserved for later (`@nikema/alibi`). For v0.1 the bin can just be `alibi` locally.
@@ -26,7 +26,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check:** `npm run build` passes with no TS errors, and `npx alibi --help` prints usage and exits 0.
 
-**Stop rule:** push branch `slice-0-scaffold`, report, wait.
+**Stop rule:** push branch `slice-0-scaffold`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -43,7 +43,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 - `--project-root /etc` fails with a clear message;
 - a missing `--dir` fails with a clear message.
 
-**Stop rule:** push branch `slice-1-intake`, report, wait.
+**Stop rule:** push branch `slice-1-intake`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -57,7 +57,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check:** provision from `fixtures/sample-script/`, then list the directory inside the sandbox and read back a canary file byte-for-byte identical to the local copy. Then tear down manually.
 
-**Stop rule:** push branch `slice-2-provision`, report, wait.
+**Stop rule:** push branch `slice-2-provision`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -70,7 +70,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check:** run `fixtures/sample-script/run.sh` (prints to stdout and stderr, exits 0) and `fixtures/sample-script/fail.sh` (exits 3): both outputs captured exactly, exit codes propagate.
 
-**Stop rule:** push branch `slice-3-execute`, report, wait.
+**Stop rule:** push branch `slice-3-execute`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -86,7 +86,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 - makes an outbound HTTPS request to a known URL,
 - spawns a child process.
 
-**Stop rule:** push branch `slice-4-capture`, report, wait.
+**Stop rule:** push branch `slice-4-capture`, open a PR against main with your report as the description, wait.
 
 **Nikema's checkpoint (from the build plan):** she reads one full alibi for a script whose behavior she already knows. If the receipt misses something she knows happened, the capture layer is not done. Nothing moves past this slice until the hook earns her trust.
 
@@ -103,7 +103,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check:** golden tests. Feed the slice three canned event logs (clean script, network-only script, naughty script) and assert the verdicts are PASS, FLAG, FLAG and that `alibi.md` and `alibi.json` match the expected files byte-for-byte.
 
-**Stop rule:** push branch `slice-5-report`, report, wait.
+**Stop rule:** push branch `slice-5-report`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -115,7 +115,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check:** run an end-to-end audit of `fixtures/sample-script/`, then verify no sandbox VMs remain on the account afterwards (console or list API). Separately, verify a deliberately hanging entrypoint gets reclaimed by the idle timeout.
 
-**Stop rule:** push branch `slice-6-teardown`, report, wait.
+**Stop rule:** push branch `slice-6-teardown`, open a PR against main with your report as the description, wait.
 
 ---
 
@@ -127,7 +127,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 
 **Acceptance check (the Phase 1 exit):** the run produces `alibi.md` + `alibi.json` that correctly list files touched, network destinations, and processes spawned for that script.
 
-**Stop rule:** push branch `slice-7-e2e`, report, wait.
+**Stop rule:** push branch `slice-7-e2e`, open a PR against main with your report as the description, wait.
 
 **Nikema's final v0.1 checkpoint:** she reviews the full receipt for a script whose behavior she knows. Only her signoff closes v0.1.
 
