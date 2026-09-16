@@ -27,6 +27,8 @@ Slice 4 captures four event classes for the entrypoint run:
   URL and arguments.
 - **Processes spawned:** the in-sandbox `sh` wrapper records child shell
   invocations.
+- Processes spawned without going through `sh` are invisible to the process
+  wrapper.
 - **Environment and sensitive-path access:** paths such as `.env`, `~/.ssh`,
   `~/.aws`, and `*.pem` are visible through the file-read events.
 

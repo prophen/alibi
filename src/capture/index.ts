@@ -25,6 +25,10 @@ export class CaptureError extends Error {
 const EVENTS_PATH = "/tmp/alibi-events";
 const WRAPPER_DIR = "/tmp/alibi-bin";
 
+function isInstrumentationPath(path: string): boolean {
+  return path === EVENTS_PATH || path.startsWith(`${WRAPPER_DIR}/`);
+}
+
 function shellQuote(value: string): string {
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
@@ -63,7 +67,12 @@ async function snapshotFiles(
   if (result.exitCode !== 0) {
     throw new CaptureError(`failed to snapshot sandbox files: ${result.stderr.trim()}`);
   }
-  return new Set(result.stdout.split("\n").map((path) => path.trim()).filter(Boolean));
+  return new Set(
+    result.stdout
+      .split("\n")
+      .map((path) => path.trim())
+      .filter((path) => path.length > 0 && !isInstrumentationPath(path)),
+  );
 }
 
 async function readEvents(provisioned: ProvisionedSandbox): Promise<string> {
