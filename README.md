@@ -10,6 +10,12 @@ Your coding agents ship code they can't vouch for. Every run gets an alibi.
 
 Alibi runs agent-written code in a throwaway Solari sandbox with an audit hook attached, then produces a behavior receipt (`alibi.md` + `alibi.json`) with a PASS/FLAG/FAIL verdict.
 
+The Slice 3 executor runs `--entry` with Solari's `commands.run("sh", { args:
+["-c", entry] })` API. This is explicit shell execution: Solari does not
+interpret command strings itself, and the CLI keeps the declared command's
+stdout, stderr, and exit code unchanged. A non-zero entrypoint exit is returned
+by the CLI after the sandbox is cleaned up.
+
 Docs in this repo: `SPEC.md` (the v0.1 spec), `BUILD-PLAN.md` (sequenced v0.1-v0.4 plan), `BUILD-SLICES.md` (coder-bot-ready build slices for v0.1).
 
 ## Status

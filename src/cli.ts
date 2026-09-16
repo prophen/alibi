@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import { IntakeError, parseIntake } from "./intake/index.js";
+import { execute, ExecuteError } from "./execute/index.js";
 import { ProvisionError, provision } from "./provision/index.js";
 
 const usage = `Usage: alibi <command> [options]
 
 Commands:
-  audit   Validate a directory intake
+  audit   Run the entrypoint in a Solari sandbox
   provision  Provision a directory in a Solari sandbox
 
 Options:
@@ -39,11 +40,24 @@ async function main(): Promise<void> {
       guestRoot: provisioned.guestRoot,
       expiresAt: provisioned.sandbox.expiresAt,
     }, null, 2)}\n`);
+    await provisioned.sandbox.kill();
     return;
   }
-  process.stdout.write(`${JSON.stringify(intake, null, 2)}\n`);
+  const provisioned = await provision(intake);
+  try {
+    const result = await execute(provisioned, intake.entry);
+    process.stdout.write(result.stdout);
+    process.stderr.write(result.stderr);
+    process.exitCode = result.exitCode;
+  } finally {
+    await provisioned.sandbox.kill();
+  }
  } catch (error) {
-  if (error instanceof IntakeError || error instanceof ProvisionError) {
+  if (
+    error instanceof IntakeError ||
+    error instanceof ProvisionError ||
+    error instanceof ExecuteError
+  ) {
     process.stderr.write(`Error: ${error.message}\n`);
     process.exit(1);
   }
