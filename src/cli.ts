@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { IntakeError, parseIntake } from "./intake/index.js";
-import { execute, ExecuteError } from "./execute/index.js";
+import { CaptureError, capture } from "./capture/index.js";
 import { ProvisionError, provision } from "./provision/index.js";
 
 const usage = `Usage: alibi <command> [options]
@@ -45,10 +45,16 @@ async function main(): Promise<void> {
   }
   const provisioned = await provision(intake);
   try {
-    const result = await execute(provisioned, intake.entry);
-    process.stdout.write(result.stdout);
-    process.stderr.write(result.stderr);
-    process.exitCode = result.exitCode;
+    const result = await capture(
+      provisioned,
+      intake.entry,
+      intake.dir,
+      intake.projectRoot,
+    );
+    process.stdout.write(result.command.stdout);
+    process.stderr.write(result.command.stderr);
+    process.stdout.write(`${JSON.stringify({ events: result.events }, null, 2)}\n`);
+    process.exitCode = result.command.exitCode;
   } finally {
     await provisioned.sandbox.kill();
   }
@@ -56,7 +62,7 @@ async function main(): Promise<void> {
   if (
     error instanceof IntakeError ||
     error instanceof ProvisionError ||
-    error instanceof ExecuteError
+    error instanceof CaptureError
   ) {
     process.stderr.write(`Error: ${error.message}\n`);
     process.exit(1);
