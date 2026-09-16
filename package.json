@@ -1,0 +1,18 @@
+{
+  "name": "alibi",
+  "version": "0.1.0",
+  "description": "Audit receipts for agent-produced code.",
+  "license": "MIT",
+  "bin": {
+    "alibi": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
