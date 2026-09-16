@@ -1,7 +1,5 @@
 # Alibi
 
-# Alibi
-
 ## Honest limits
 
 - Not a malware-analysis sandbox. It won't catch exfiltration over an allowlisted channel, timing attacks, or logic bombs that trigger later.
