@@ -1,0 +1,34 @@
+{
+  "entry": "sh fetch-example.sh",
+  "verdict": "FLAG",
+  "findings": [
+    {
+      "reason": "outbound network connection",
+      "event": {
+        "class": "network",
+        "detail": "https://example.com"
+      }
+    }
+  ],
+  "counts": {
+    "filesRead": 0,
+    "filesWritten": 1,
+    "network": 1,
+    "processes": 1
+  },
+  "events": [
+    {
+      "class": "process",
+      "detail": "fetch-example.sh"
+    },
+    {
+      "class": "network",
+      "detail": "https://example.com"
+    },
+    {
+      "class": "file-write",
+      "detail": "/workspace/page.html"
+    }
+  ],
+  "exitCode": 0
+}
