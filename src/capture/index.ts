@@ -1,7 +1,7 @@
-import type { CommandResult } from "@solarisdk/sandbox";
 import { join, relative } from "node:path";
 import { Buffer } from "node:buffer";
 import type { ProvisionedSandbox } from "../provision/index.js";
+import type { ExecutionResult } from "../execute/index.js";
 
 export type CaptureEventClass = "file-read" | "file-write" | "network" | "process";
 
@@ -11,8 +11,14 @@ export interface CaptureEvent {
 }
 
 export interface CaptureResult {
-  command: CommandResult;
+  command: ExecutionResult;
   events: CaptureEvent[];
+}
+
+export interface CaptureSession {
+  before: Set<string>;
+  cwd: string;
+  env: Record<string, string>;
 }
 
 export class CaptureError extends Error {
@@ -49,7 +55,10 @@ function parseEvents(trace: string): CaptureEvent[] {
     if (kind === "read") {
       add({ class: "file-read", detail });
     } else if (kind === "network") {
-      add({ class: "network", detail });
+      const url = detail
+        .split(/\s+/)
+        .find((argument) => /^https?:\/\//.test(argument));
+      add({ class: "network", detail: url ?? detail });
     } else if (kind === "process") {
       add({ class: "process", detail });
     }
@@ -104,12 +113,11 @@ function wrapperSource(): string {
   ].join("\n");
 }
 
-export async function capture(
+export async function startCapture(
   provisioned: ProvisionedSandbox,
-  entry: string,
   directory: string,
   projectRoot: string,
-): Promise<CaptureResult> {
+): Promise<CaptureSession> {
   const before = await snapshotFiles(provisioned);
   const projectRootInGuest = join(
     provisioned.guestRoot,
@@ -117,19 +125,51 @@ export async function capture(
   );
   const wrapper = Buffer.from(wrapperSource()).toString("base64");
   const setup = `mkdir -p ${WRAPPER_DIR}; : > ${EVENTS_PATH}; printf '%s' ${shellQuote(wrapper)} | base64 -d > ${WRAPPER_DIR}/alibi-wrapper; chmod +x ${WRAPPER_DIR}/alibi-wrapper; ln -sf ${WRAPPER_DIR}/alibi-wrapper ${WRAPPER_DIR}/cat; ln -sf ${WRAPPER_DIR}/alibi-wrapper ${WRAPPER_DIR}/curl; ln -sf ${WRAPPER_DIR}/alibi-wrapper ${WRAPPER_DIR}/sh`;
-  const command = `${setup}; PATH=${WRAPPER_DIR}:$PATH sh -c ${shellQuote(entry)}`;
-  const result = await provisioned.sandbox.commands.run("sh", {
-    args: ["-c", command],
+  const setupResult = await provisioned.sandbox.commands.run("sh", {
+    args: ["-c", setup],
     cwd: projectRootInGuest,
   });
+  if (setupResult.exitCode !== 0) {
+    throw new CaptureError(`failed to install audit hook: ${setupResult.stderr.trim()}`);
+  }
+
+  return {
+    before,
+    cwd: projectRootInGuest,
+    env: {
+      PATH: `${WRAPPER_DIR}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin`,
+    },
+  };
+}
+
+export async function finishCapture(
+  provisioned: ProvisionedSandbox,
+  session: CaptureSession,
+  command: ExecutionResult,
+): Promise<CaptureResult> {
   const after = await snapshotFiles(provisioned);
   const events = parseEvents(await readEvents(provisioned));
 
   for (const path of after) {
-    if (!before.has(path)) {
+    if (!session.before.has(path)) {
       events.push({ class: "file-write", detail: path });
     }
   }
 
-  return { command: result, events };
+  return { command, events };
+}
+
+export async function capture(
+  provisioned: ProvisionedSandbox,
+  entry: string,
+  directory: string,
+  projectRoot: string,
+): Promise<CaptureResult> {
+  const session = await startCapture(provisioned, directory, projectRoot);
+  const command = await provisioned.sandbox.commands.run("sh", {
+    args: ["-c", entry],
+    cwd: provisioned.guestRoot,
+    env: session.env,
+  });
+  return finishCapture(provisioned, session, command);
 }

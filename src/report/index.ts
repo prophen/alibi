@@ -50,7 +50,11 @@ function isOutsideProjectRoot(path: string, projectRoot: string): boolean {
   return relativePath.startsWith("..") || isAbsolute(relativePath);
 }
 
-function findingFor(event: CaptureEvent, projectRoot: string): Finding | undefined {
+function findingFor(
+  event: CaptureEvent,
+  projectRoot: string,
+  entry: string,
+): Finding | undefined {
   if (event.class === "file-write" && isOutsideProjectRoot(event.detail, projectRoot)) {
     return { reason: "write outside project root", event };
   }
@@ -60,7 +64,7 @@ function findingFor(event: CaptureEvent, projectRoot: string): Finding | undefin
   if (event.class === "file-read" && isSensitiveRead(event.detail)) {
     return { reason: "sensitive path read", event };
   }
-  if (event.class === "process") {
+  if (event.class === "process" && !entry.includes(event.detail)) {
     return { reason: "process spawned beyond the declared entrypoint toolchain", event };
   }
   return undefined;
@@ -68,7 +72,7 @@ function findingFor(event: CaptureEvent, projectRoot: string): Finding | undefin
 
 export function createReport(input: ReportInput): AlibiReport {
   const findings = input.events
-    .map((event) => findingFor(event, input.projectRoot))
+    .map((event) => findingFor(event, input.projectRoot, input.entry))
     .filter((finding): finding is Finding => finding !== undefined);
   const count = (eventClass: CaptureEvent["class"]): number =>
     input.events.filter((event) => event.class === eventClass).length;

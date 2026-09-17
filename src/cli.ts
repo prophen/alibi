@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 
 import { IntakeError, parseIntake } from "./intake/index.js";
-import { CaptureError, capture } from "./capture/index.js";
+import {
+  CaptureError,
+  finishCapture,
+  startCapture,
+} from "./capture/index.js";
+import { ExecuteError, execute } from "./execute/index.js";
 import { ProvisionError, provision } from "./provision/index.js";
 import { createReport, writeReport } from "./report/index.js";
 import { teardown, TeardownError } from "./teardown/index.js";
@@ -50,18 +55,22 @@ async function main(): Promise<void> {
   }
   const provisioned = await provision(intake);
   try {
-    const result = await capture(
+    const captureSession = await startCapture(
       provisioned,
-      intake.entry,
       intake.dir,
       intake.projectRoot,
     );
+    const command = await execute(provisioned, intake.entry, {
+      cwd: captureSession.cwd,
+      env: captureSession.env,
+    });
+    const result = await finishCapture(provisioned, captureSession, command);
     process.stdout.write(result.command.stdout);
     process.stderr.write(result.command.stderr);
     const report = createReport({
       entry: intake.entry,
       intent: intake.intent,
-      projectRoot: intake.projectRoot,
+      projectRoot: captureSession.cwd,
       events: result.events,
       exitCode: result.command.exitCode,
     });
@@ -76,6 +85,7 @@ async function main(): Promise<void> {
     error instanceof IntakeError ||
     error instanceof ProvisionError ||
     error instanceof CaptureError ||
+    error instanceof ExecuteError ||
     error instanceof TeardownError
   ) {
     process.stderr.write(`Error: ${error.message}\n`);

@@ -22,12 +22,14 @@ export class ExecuteError extends Error {
 export async function execute(
   provisioned: ProvisionedSandbox,
   entry: string,
+  options: { cwd?: string; env?: Record<string, string> } = {},
 ): Promise<ExecutionResult> {
   let result: CommandResult;
   try {
     result = await provisioned.sandbox.commands.run("sh", {
       args: ["-c", entry],
-      cwd: provisioned.guestRoot,
+      cwd: options.cwd ?? provisioned.guestRoot,
+      env: options.env,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
