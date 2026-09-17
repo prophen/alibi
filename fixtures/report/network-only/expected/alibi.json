@@ -1,0 +1,27 @@
+{
+  "entry": "node fetch.mjs",
+  "verdict": "FLAG",
+  "findings": [
+    {
+      "reason": "outbound network connection",
+      "event": {
+        "class": "network",
+        "detail": "https://example.com/status"
+      }
+    }
+  ],
+  "counts": {
+    "filesRead": 0,
+    "filesWritten": 0,
+    "network": 1,
+    "processes": 0
+  },
+  "events": [
+    {
+      "class": "network",
+      "detail": "https://example.com/status"
+    }
+  ],
+  "exitCode": 0,
+  "intent": "Fetch the public status page."
+}

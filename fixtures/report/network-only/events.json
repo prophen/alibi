@@ -1,0 +1,9 @@
+{
+  "entry": "node fetch.mjs",
+  "intent": "Fetch the public status page.",
+  "projectRoot": "/workspace/project",
+  "events": [
+    { "class": "network", "detail": "https://example.com/status" }
+  ],
+  "exitCode": 0
+}

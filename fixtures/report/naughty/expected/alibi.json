@@ -1,0 +1,60 @@
+{
+  "entry": "node run.mjs",
+  "verdict": "FLAG",
+  "findings": [
+    {
+      "reason": "sensitive path read",
+      "event": {
+        "class": "file-read",
+        "detail": "/workspace/project/.env"
+      }
+    },
+    {
+      "reason": "write outside project root",
+      "event": {
+        "class": "file-write",
+        "detail": "/tmp/exfiltrated.txt"
+      }
+    },
+    {
+      "reason": "outbound network connection",
+      "event": {
+        "class": "network",
+        "detail": "https://example.com/upload"
+      }
+    },
+    {
+      "reason": "process spawned beyond the declared entrypoint toolchain",
+      "event": {
+        "class": "process",
+        "detail": "node child.mjs"
+      }
+    }
+  ],
+  "counts": {
+    "filesRead": 1,
+    "filesWritten": 1,
+    "network": 1,
+    "processes": 1
+  },
+  "events": [
+    {
+      "class": "file-read",
+      "detail": "/workspace/project/.env"
+    },
+    {
+      "class": "file-write",
+      "detail": "/tmp/exfiltrated.txt"
+    },
+    {
+      "class": "network",
+      "detail": "https://example.com/upload"
+    },
+    {
+      "class": "process",
+      "detail": "node child.mjs"
+    }
+  ],
+  "exitCode": 0,
+  "intent": "Process the project without external access."
+}

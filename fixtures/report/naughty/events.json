@@ -1,0 +1,12 @@
+{
+  "entry": "node run.mjs",
+  "intent": "Process the project without external access.",
+  "projectRoot": "/workspace/project",
+  "events": [
+    { "class": "file-read", "detail": "/workspace/project/.env" },
+    { "class": "file-write", "detail": "/tmp/exfiltrated.txt" },
+    { "class": "network", "detail": "https://example.com/upload" },
+    { "class": "process", "detail": "node child.mjs" }
+  ],
+  "exitCode": 0
+}

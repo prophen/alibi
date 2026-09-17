@@ -10,6 +10,12 @@ Your coding agents ship code they can't vouch for. Every run gets an alibi.
 
 Alibi runs agent-written code in a throwaway Solari sandbox with an audit hook attached, then produces a behavior receipt (`alibi.md` + `alibi.json`) with a PASS/FLAG/FAIL verdict.
 
+The v0.1 report policy is hardcoded: writes outside the project root, outbound
+network connections, sensitive-path reads (`.env*`, `~/.ssh`, `~/.aws`, and
+`*.pem`), and observed process spawns produce `FLAG`. Everything else produces
+`PASS`; `FAIL` is reserved for the configurable policy in v0.2. Network is
+allowed but flagged in v0.1.
+
 The Slice 3 executor runs `--entry` with Solari's `commands.run("sh", { args:
 ["-c", entry] })` API. This is explicit shell execution: Solari does not
 interpret command strings itself, and the CLI keeps the declared command's

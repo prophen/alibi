@@ -3,6 +3,7 @@
 import { IntakeError, parseIntake } from "./intake/index.js";
 import { CaptureError, capture } from "./capture/index.js";
 import { ProvisionError, provision } from "./provision/index.js";
+import { createReport, writeReport } from "./report/index.js";
 
 const usage = `Usage: alibi <command> [options]
 
@@ -53,7 +54,15 @@ async function main(): Promise<void> {
     );
     process.stdout.write(result.command.stdout);
     process.stderr.write(result.command.stderr);
-    process.stdout.write(`${JSON.stringify({ events: result.events }, null, 2)}\n`);
+    const report = createReport({
+      entry: intake.entry,
+      intent: intake.intent,
+      projectRoot: intake.projectRoot,
+      events: result.events,
+      exitCode: result.command.exitCode,
+    });
+    await writeReport(report);
+    process.stdout.write(`${JSON.stringify({ verdict: report.verdict }, null, 2)}\n`);
     process.exitCode = result.command.exitCode;
   } finally {
     await provisioned.sandbox.kill();

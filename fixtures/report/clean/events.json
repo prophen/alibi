@@ -1,0 +1,10 @@
+{
+  "entry": "node clean.mjs",
+  "intent": "Format the input data locally.",
+  "projectRoot": "/workspace/project",
+  "events": [
+    { "class": "file-read", "detail": "/workspace/project/input.json" },
+    { "class": "file-write", "detail": "/workspace/project/output.json" }
+  ],
+  "exitCode": 0
+}

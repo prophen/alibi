@@ -1,0 +1,23 @@
+{
+  "entry": "node clean.mjs",
+  "verdict": "PASS",
+  "findings": [],
+  "counts": {
+    "filesRead": 1,
+    "filesWritten": 1,
+    "network": 0,
+    "processes": 0
+  },
+  "events": [
+    {
+      "class": "file-read",
+      "detail": "/workspace/project/input.json"
+    },
+    {
+      "class": "file-write",
+      "detail": "/workspace/project/output.json"
+    }
+  ],
+  "exitCode": 0,
+  "intent": "Format the input data locally."
+}
