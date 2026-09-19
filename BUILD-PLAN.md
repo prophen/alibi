@@ -26,7 +26,7 @@ Checked five current options against the spec's Solari choice. Bottom line up fr
 - **Daytona.** Container-based, ~90ms provisioning, $0.0504/vCPU-hr, open-source and self-hostable. No dedicated behavior-audit API.
 - **Modal.** `modal.Sandbox.create()`, gVisor isolation, priciest compute of the set (~$0.0710/vCPU-hr equivalent). No verified syscall/network event stream.
 
-**No provider ships a ready-made "files touched, network calls, processes spawned" audit stream.** Every option requires building the capture layer. That is the core build risk of the whole project, and it lives in Phase 1.
+**No provider ships a ready-made "observed file activity, network calls, processes spawned" audit stream.** Every option requires building the capture layer. That is the core build risk of the whole project, and it lives in Phase 1.
 
 ## Sequenced phases
 
@@ -34,7 +34,7 @@ Checked five current options against the spec's Solari choice. Bottom line up fr
 
 - **Entry:** Solari key in hand — Nikema redeemed the hiring-post code on 2026-09-15: starter tier, first month free, $20 credit (subscription will bill after the free month; cancel if not needed ongoing). SDK surface and current pricing confirmed in the console. One real agent-produced script to audit.
 - **Work:** Intake CLI (`--dir`, `--entry`, `--project-root`, `--intent`), provision, execute, the capture shim, report rendering (`alibi.md` + `alibi.json`) with the hardcoded FLAG/PASS policy, teardown.
-- **Exit:** A real script runs end to end and produces a receipt that correctly lists files touched, network destinations, and processes spawned. The honest-limits section is written in the README first, not last.
+- **Exit:** A real script runs end to end and produces a receipt that correctly lists observed file activity, network destinations, and processes spawned. The honest-limits section is written in the README first, not last.
 - **Checkpoint — your review:** read one full alibi for a script you already know the behavior of. If the receipt misses something you know happened, the capture layer isn't done. Nothing moves to v0.2 until the hook earns your trust.
 
 ### Phase 2 — v0.2: the PR-review story
