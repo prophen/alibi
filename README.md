@@ -10,6 +10,26 @@ Your coding agents ship code they can't vouch for. Every run gets an alibi.
 
 Alibi runs agent-written code in a throwaway Solari sandbox with an audit hook attached, then produces a behavior receipt (`alibi.md` + `alibi.json`) with a PASS/FLAG/FAIL verdict.
 
+## Sample receipt
+
+`alibi audit --dir ./example --entry "sh fetch-example.sh"` against a script that fetches a URL produces `alibi.md`:
+
+````md
+# Alibi — sh fetch-example.sh
+Verdict: FLAG (1 findings)
+
+## What it did
+- Files written: 1 — /workspace/page.html
+- Files read: 0 — none
+- Network: 1 — https://example.com
+- Processes: 1 — fetch-example.sh
+
+## Findings
+- FLAG: outbound network connection — https://example.com
+````
+
+The full event log ships alongside as `alibi.json`. A clean run with no findings produces `PASS`.
+
 The v0.1 report policy is hardcoded: writes outside the project root, outbound
 network connections, sensitive-path reads (`.env*`, `~/.ssh`, `~/.aws`, and
 `*.pem`), and observed process spawns produce `FLAG`. Everything else produces
@@ -50,9 +70,16 @@ Docs in this repo: `SPEC.md` (the v0.1 spec), `BUILD-PLAN.md` (sequenced v0.1-v0
 
 ## Status
 
-Alibi is being built as a CLI for producing audit receipts for agent-produced code.
+v0.1 is complete: all 8 build slices are merged. The CLI audits agent-written code in a throwaway Solari sandbox and produces `alibi.md` + `alibi.json` behavior receipts with PASS/FLAG verdicts.
+
+v0.2 roadmap: configurable policy (adds FAIL verdicts), patch intake, and deny-by-default `--strict` mode.
 
 ## Development
+
+### Prerequisites
+
+- Node.js 18 or later
+- A Solari API key exported as `SOLARI_API_KEY`
 
 ```sh
 npm install
