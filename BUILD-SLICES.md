@@ -125,7 +125,7 @@ Source of truth: `SPEC.md` (locked 2026-09-13) and `BUILD-PLAN.md` Phase 1. This
 - Wire intake, provision, execute, capture, report, teardown into `alibi audit`.
 - Run it once against a real agent-produced script (Nikema supplies one; suggested first candidate: a small script her Hermes coder bot actually wrote).
 
-**Acceptance check (the Phase 1 exit):** the run produces `alibi.md` + `alibi.json` that correctly list files touched, network destinations, and processes spawned for that script.
+**Acceptance check (the Phase 1 exit):** the run produces `alibi.md` + `alibi.json` that correctly list observed file activity, network destinations, and processes spawned for that script.
 
 **Stop rule:** push branch `slice-7-e2e`, open a PR against main with your report as the description, wait.
 
