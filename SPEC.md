@@ -8,7 +8,7 @@ AI coding agents write real code that touches real files, and human review doesn
 
 ## What it does
 
-A CLI. You hand it a directory of agent-produced code — a project, a script, whatever the agent made — plus a declaration of what it's supposed to do. It runs the code in a throwaway Solari sandbox with an audit hook attached, captures everything the code actually did, and produces an **alibi**: a markdown + JSON report of observed behavior plus a verdict. (Patch-file intake lands in v0.2.)
+A CLI. You hand it a directory of agent-produced code — a project, a script, whatever the agent made — plus a declaration of what it's supposed to do. It runs the code in a throwaway Solari sandbox with an audit hook attached, records the behavior the sandbox exposes, and produces an **alibi**: a markdown + JSON report of observed behavior plus a verdict. (Patch-file intake lands in v0.2.)
 
 ```
 npx alibi audit --dir ./agent-output \
@@ -80,7 +80,7 @@ Backfill user avatars from Gravatar, dry run only, no writes
 
 ## Milestones
 
-- **v0.1** — single-script intake, hardcoded policy, md+JSON receipt. Prove the audit hook captures what we need.
+- **v0.1** — directory intake, hardcoded policy, md+JSON receipt. Prove the audit hook captures what we need.
 - **v0.2** — patch/diff intake, policy config file, FAIL tier, `--strict` network mode (deny-by-default with allowlist).
 - **v0.3** — intent-vs-behavior check: compare the agent's `--intent` claim against observed behavior and flag contradictions explicitly.
 - **v0.4** — dogfood on real Hermes coder-bot output, publish the repo, Field Notes writeup ("My agents need an alibi").
