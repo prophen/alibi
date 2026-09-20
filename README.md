@@ -38,6 +38,14 @@ network connections, sensitive-path reads (`.env*`, `~/.ssh`, `~/.aws`, and
 `PASS`; `FAIL` is reserved for the configurable policy in v0.2. Network is
 allowed but flagged in v0.1.
 
+## Architecture
+
+![Alibi audit pipeline](demo/alibi-pipeline.png)
+
+One module per stage under `src/`: **intake** validates the flags, **provision** boots the Solari sandbox and uploads the directory, **capture** installs the audit hook, **execute** runs the declared entrypoint, **report** applies the policy and renders the receipt, and **teardown** kills the sandbox in `try/finally` no matter what.
+
+The capture stage is the core of the tool. Solari exposes no event stream, so Alibi fakes one: a single shell script symlinked as `cat`, `curl`, and `sh`, placed first on `PATH`. Each wrapper logs its event (file read, network URL, process spawn) and then runs the real binary. File writes come from a before/after `find` snapshot. Wrapper and filesystem-diff observation, not a forensic syscall recorder; the README documents exactly what is and isn't captured.
+
 The Slice 3 executor runs `--entry` with Solari's `commands.run("sh", { args:
 ["-c", entry] })` API. This is explicit shell execution: Solari does not
 interpret command strings itself, and the CLI keeps the declared command's
